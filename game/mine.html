@@ -220,10 +220,9 @@
             content: "*";
             /* display: none; */
         }
-        
-        .mine_item[mine="1"] {
+        /* .mine_item[mine="1"] {
             background: rgb(236, 204, 204);
-        }
+        } */
         
         .mine_item[open="1"][mine="1"] {
             background: red;
@@ -274,6 +273,10 @@
     </style>
 
     <style class="block_style">
+
+    </style>
+
+    <style class="debug_style">
 
     </style>
 
@@ -345,7 +348,16 @@
 
         init();
 
+        function checkDebug() {
+            if (location.search.indexOf('debug=true') > -1) {
+                var debugStyle = '.mine_item[mine="1"]{background: rgb(236, 204, 204);}'
+                $('.debug_style').html(debugStyle);
+            }
+        }
+
         function init() {
+
+            checkDebug();
 
             var clickItem = {
                 index: 0,
