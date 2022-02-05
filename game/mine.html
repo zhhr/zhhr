@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>扫雷</title>
+</head>
+
+<body>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        .clearfix:after {
+            content: "";
+            display: block;
+            clear: both;
+        }
+        
+        html,
+        body,
+        .wrap {
+            height: 100%;
+        }
+        
+        body {
+            padding: 10px;
+            background: #ddd;
+        }
+        
+        .wrap {
+            position: relative;
+            border: 1px solid #ccc;
+            padding-top: 80px;
+        }
+        
+        .btn {
+            border: 1px solid #ccc;
+            padding: 0 10px;
+            height: 30px;
+            font-size: 16px;
+            line-height: 26px;
+            color: #333;
+            background: #c0c0c0;
+            border: 2px solid #808080;
+            border-top-color: #fafafa;
+            border-left-color: #fafafa;
+            user-select: none;
+        }
+        
+        .panel {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 40px;
+            line-height: 40px;
+            font-size: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #919191;
+        }
+        
+        .start_btn {
+            width: 30px;
+            height: 30px;
+            padding: 1px;
+        }
+        
+        .start_btn .start_btn_in {
+            height: 100%;
+            border-radius: 50%;
+            background: #fcff00 url('data:image/svg+xml;charset=utf-8,<svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20" height="20"><path d="M512.864 1024c-69.106 0-136.158-13.54-199.305-40.247-60.975-25.792-115.725-62.705-162.737-109.716S66.898 772.275 41.106 711.3C14.399 648.163 0.859 581.101 0.859 511.995S14.4 375.837 41.106 312.69c25.792-60.965 62.705-115.715 109.716-162.727C197.834 102.952 252.584 66.04 313.56 40.247 376.697 13.54 443.758 0 512.864 0S649.022 13.54 712.17 40.247c60.975 25.792 115.725 62.705 162.737 109.716 47.011 47.012 83.924 101.762 109.716 162.737 26.707 63.137 40.247 130.199 40.247 199.305s-13.54 136.158-40.247 199.305c-25.792 60.975-62.705 115.725-109.716 162.737S773.144 957.97 712.169 983.763C649.022 1010.46 581.97 1024 512.864 1024z m0-968.935c-251.961 0-456.94 204.979-456.94 456.93s204.979 456.93 456.93 456.93 456.93-204.979 456.93-456.93c0.01-251.951-204.969-456.93-456.92-456.93z" ></path><path d="M512.5 855.472c-101.752 0-193.592-60.355-233.996-153.759-6.037-13.953 0.384-30.167 14.337-36.195 13.953-6.038 30.167 0.383 36.195 14.336 31.682 73.237 103.699 120.553 183.464 120.553 80.474 0 152.727-47.896 184.074-122.018 5.92-14.002 22.075-20.56 36.087-14.631 14.003 5.92 20.561 22.075 14.632 36.087-39.981 94.544-132.146 155.627-234.793 155.627zM271.975 384.51a50.994 50.994 0 1 0 101.988 0 50.994 50.994 0 1 0-101.988 0zM651.755 384.51a50.994 50.994 0 1 0 101.988 0 50.994 50.994 0 1 0-101.988 0z" ></path></svg>') no-repeat center center;
+            background-size: cover;
+        }
+        
+        .start_btn[over="1"] .start_btn_in {
+            background: #ff1100 url('data:image/svg+xml;charset=utf-8,<svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20" height="20"><path d="M511.874862 1023.99912A511.99883 511.99883 0 0 1 312.62052 40.495165a512.00083 512.00083 0 0 1 398.508684 943.276183A508.89462 508.89462 0 0 1 511.874862 1023.99912z m0-968.688722c-251.896958 0-456.823858 204.9269-456.823858 456.81386s204.9269 456.81386 456.81386 456.813861 456.81386-204.9269 456.813861-456.813861-204.916902-456.81386-456.803863-456.81386z" ></path><path d="M511.510954 611.676948a254.735237 254.735237 0 0 0-233.940523 153.719919 27.522003 27.522003 0 0 0 50.519156 21.853444 199.816199 199.816199 0 0 1 367.444582 1.464627 27.530001 27.530001 0 0 0 50.710107-21.450546 254.385326 254.385326 0 0 0-234.733322-155.587444z" ></path><path d="M271.047089 384.671662a50.981039 50.981039 0 1 0 50.981039-50.981039 50.981039 50.981039 0 0 0-50.981039 50.981039z" ></path><path d="M650.730559 384.671662a50.981039 50.981039 0 1 0 50.981039-50.981039 50.981039 50.981039 0 0 0-50.981039 50.981039z" ></path></svg>') no-repeat center center;
+            background-size: cover;
+        }
+        
+        .count,
+        .time {
+            color: #ff6666;
+            min-width: 2em;
+            font-family: Consolas, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
+        }
+        
+        .time {
+            color: #ff9f66;
+            text-align: right;
+        }
+        
+        .setting {
+            position: absolute;
+            left: 0;
+            top: 50px;
+            width: 100%;
+            height: 20px;
+            line-height: 20px;
+            font-size: 16px;
+        }
+        
+        .setting label {
+            color: #666;
+            display: inline-block;
+        }
+        
+        .setting_input {
+            width: 3.5em;
+            height: 20px;
+        }
+        
+        .setting_select {
+            width: 5em;
+            height: 20px;
+        }
+        
+        .mine_area_wrap {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            text-align: center;
+        }
+        
+        .mine_area {
+            display: inline-block;
+            background: #c0c0c0;
+            border: 1px solid #919191;
+        }
+        
+        .mine_row {
+            font-size: 0;
+            white-space: nowrap;
+        }
+        
+        .mine_item {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            font-size: 30px;
+            line-height: 38px;
+            vertical-align: middle;
+            text-align: center;
+            border: 3px solid #808080;
+            border-top-color: #fafafa;
+            border-left-color: #fafafa;
+            /* box-shadow: 3px 3px 0px #ec9b9b inset; */
+        }
+        
+        .mine_item[open="1"] {
+            background: #bebebe;
+            border: 1px solid #919191;
+        }
+        
+        .mine_item[open="1"]::before {
+            content: "";
+            position: absolute;
+            left: 1px;
+            top: 1px;
+            display: block;
+            width: calc(100% - 2px);
+            height: calc(100% - 2px);
+        }
+        
+        .mine_item[open="1"][count="1"]::before {
+            content: "1";
+            color: #009688;
+        }
+        
+        .mine_item[open="1"][count="2"]::before {
+            content: "2";
+            color: #00bcd4;
+        }
+        
+        .mine_item[open="1"][count="3"]::before {
+            content: "3";
+            color: #2196f3;
+        }
+        
+        .mine_item[open="1"][count="4"]::before {
+            content: "4";
+            color: #673ab7;
+        }
+        
+        .mine_item[open="1"][count="5"]::before {
+            content: "5";
+            color: #ffc107;
+        }
+        
+        .mine_item[open="1"][count="6"]::before {
+            content: "6";
+            color: #ff9800;
+        }
+        
+        .mine_item[open="1"][count="7"]::before {
+            content: "7";
+            color: #ff5722;
+        }
+        
+        .mine_item[open="1"][count="8"]::before {
+            content: "8";
+            color: rgb(175, 64, 129);
+        }
+        
+        .mine_item[open="1"][count="9"]::before {
+            content: "9";
+            color: rgb(163, 62, 121);
+        }
+        
+        .mine_item[open="1"][mine="1"]::before {
+            content: "*";
+            /* display: none; */
+        }
+        
+        .mine_item[mine="1"] {
+            background: rgb(236, 204, 204);
+        }
+        
+        .mine_item[open="1"][mine="1"] {
+            background: red;
+        }
+        
+        .mine_item[mark="1"]::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: rgb(255, 125, 4);
+            background-clip: padding-box;
+            box-sizing: border-box;
+            border: 10px solid transparent;
+        }
+        
+        .size_btns {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .message_wrap {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 80%;
+        }
+        
+        .message {
+            min-width: 100px;
+            text-align: center;
+            font-size: 16px;
+            color: #fff;
+            line-height: 1.5;
+            padding: 10px;
+            border-radius: 4px;
+            background: #017b06;
+        }
+        
+        .message[type="2"] {
+            background: #d42a00;
+        }
+    </style>
+
+    <style class="block_style">
+
+    </style>
+
+    <div class="wrap">
+        <div class="panel">
+            <div class="count">099</div>
+            <div class="start_btn btn" over="0">
+                <div class="start_btn_in"></div>
+            </div>
+            <div class="time">000</div>
+            <div class="size_btns">
+                <div class="btn size_btn" type="1">-</div>
+                <div class="btn size_btn" type="2">+</div>
+            </div>
+            <!-- <label class="click_mode btn"><input type="checkbox" name="click_mode"><span>标记模式</span></label> -->
+        </div>
+        <div class="setting">
+            <label>
+                <span>横向:</span>
+                <input type="number" class="setting_input" name="width" value="10">
+            </label>
+            <label>
+                <span>纵向:</span>
+                <input type="number" class="setting_input" name="height" value="10">
+            </label>
+            <label>
+                <span>雷数:</span>
+                <input type="number" class="setting_input" name="count" value="10">
+            </label>
+
+            <select class="setting_select" name="mode">
+                <option value="1">简单</option>
+                <option value="2">中等</option>
+                <option value="3">困难</option>
+                <option value="4">自定义</option>
+            </select>
+
+
+        </div>
+        <div class="mine_area_wrap">
+            <div class="mine_area">
+                <!-- <ul class="mine_row">
+                    <li class="mine_item"></li>
+                    <li class="mine_item" open="1"></li>
+                </ul> -->
+            </div>
+        </div>
+    </div>
+
+    <div class="message_wrap">
+        <!-- <div class="message" type="1">消息</div>
+        <div class="message" type="2">消息</div> -->
+    </div>
+
+
+    <script src="https://res.bangwo8.com/js/zepto.js"></script>
+    <script>
+        var gameData = {
+            over: 0,
+            time: 0,
+            timer: null,
+            mine: {
+                total: 0, //炸弹总数
+                remain: 0, //炸弹剩余
+                mark: 0, //标记数量
+            },
+            boxsize: 40,
+        };
+
+        init();
+
+        function init() {
+
+            var clickItem = {
+                index: 0,
+                time: 0,
+            };
+
+            $('.start_btn').on('click', function() {
+                startGame();
+            })
+
+            // $('body').on('click', '.mine_item', )
+
+            //长按
+            $('body').on('mousedown', '.mine_item', onmousedown);
+            $('body').on('mouseup', '.mine_item', onmouseup);
+            $('body').on('touchstart', '.mine_item', onmousedown);
+            $('body').on('touchend', '.mine_item', onmouseup);
+
+            // 长按/短按 代替click
+            function onClick($this, isLong) {
+                if (gameData.over) {
+                    return;
+                }
+                // var click_mode = $('input[name="click_mode"]').prop('checked');
+                var click_mode = isLong;
+                var attr = click_mode ? 'mark' : 'open';
+                var attrVal = $this.attr(attr) === '1';
+                var $this = $this;
+                console.log('attr', attr, $this);
+                if (click_mode) {
+                    //mark
+                    if ($this.attr('open') === '1') {
+                        //被翻开的cell不能标记
+                        return;
+                    }
+                    //标记炸弹后，计算炸弹数量
+                    if (attrVal) {
+                        gameData.mine.mark -= 1;
+                        gameData.mine.remain += 1;
+                    } else {
+                        if (gameData.mine.mark >= gameData.mine.total) {
+                            return;
+                        }
+                        gameData.mine.mark += 1;
+                        gameData.mine.remain -= 1;
+                    }
+                    $this.attr(attr, attrVal ? '0' : '1');
+                    updateView();
+
+                } else {
+                    //open
+                    if ($this.attr('mark') === '1') {
+                        //被标记的cell不能翻开
+                        return;
+                    }
+                    if (attrVal) {
+                        return;
+                    } else {
+                        $this.attr(attr, attrVal ? '0' : '1');
+                        if ($this.attr('mine') === '1') {
+                            //todo:爆炸，游戏结束
+                            gameOver();
+                        } else {
+                            if ($this.attr('count') === '0') {
+                                //打开其他空白
+                                openNullCell($this);
+                                //计算打开的数量和剩余的数量
+                            }
+                            checkMark();
+                        }
+                    }
+                }
+
+
+            }
+
+            function onmousedown() {
+                var $this = $(this);
+                clickItem.index = $this.attr('index');
+                clickItem.time = new Date().getTime();
+            }
+
+            function onmouseup() {
+                var $this = $(this);
+                var index = $this.attr('index');
+                if (index === clickItem.index) {
+                    var time = new Date().getTime();
+                    if (time - clickItem.time > 300) {
+                        //长按
+                        console.log(111, 'chang')
+                        onClick($this, true);
+                    } else {
+                        //短按
+                        console.log(122, 'duan')
+                        onClick($this, false);
+                    }
+                }
+            }
+
+            $('.setting_select').on('change', function() {
+                modeChange();
+            })
+
+            startGame();
+
+            function modeChange() {
+                var mode = $('.setting_select').val();
+                var dict = {
+                    '1': [10, 10, 10], //10
+                    '2': [16, 16, 40], //6.4
+                    '3': [20, 20, 100], //4
+                };
+                var conf = dict[mode];
+
+                $('.setting_input[name="width"]').val(conf[0]);
+                $('.setting_input[name="height"]').val(conf[1]);
+                $('.setting_input[name="count"]').val(conf[2]);
+            }
+
+            $('.size_btn').on('click', function() {
+                var type = $(this).attr('type');
+                if (type === '1') {
+                    if (gameData.boxsize > 11) {
+                        gameData.boxsize--;
+                    }
+                } else if (type === '2') {
+                    if (gameData.boxsize < 100) {
+                        gameData.boxsize++;
+                    }
+                }
+                var style = '';
+                style += '.mine_item{width:' + gameData.boxsize + 'px;height:' + gameData.boxsize + 'px;'
+                style += 'font-size: ' + (gameData.boxsize - 10) + 'px;line-height: ' + (gameData.boxsize - 2) + 'px;}';
+
+
+                $('.block_style').html(style);
+            })
+
+
+        }
+
+
+        //检查炸弹标记状态
+        function checkMark() {
+            if ($('.mine_item[open="0"][mine="0"]').length === 0) {
+                //成功
+                gameOver();
+                setTimeout(() => {
+                    showMsg('扫雷成功!');
+                }, 20);
+            }
+        }
+
+        // 游戏结束
+        function gameOver() {
+            gameData.over = 1;
+            clearInterval(gameData.timer);
+            updateView();
+            showErr('游戏结束!');
+        }
+
+        //更新界面数字
+        function updateView() {
+            $('.start_btn').attr('over', gameData.over);
+            $('.count').text(gameData.mine.remain);
+            $('.time').text(gameData.time);
+        }
+
+        // 开始计时
+        function startTime() {
+            clearInterval(gameData.timer);
+            gameData.timer = setInterval(function() {
+                gameData.time += 1;
+                $('.time').text(gameData.time);
+            }, 1000);
+        }
+
+        //开始游戏 
+        function startGame() {
+            var width = parseInt($('.setting_input[name="width"]').val());
+            var height = parseInt($('.setting_input[name="height"]').val());
+            var count = parseInt($('.setting_input[name="count"]').val());
+            if (!(width > 0 && height > 0 && count > 0)) {
+                alert('参数错误');
+                return;
+            }
+            console.log(width, height, count)
+            gameData.mine.total = count;
+            gameData.mine.remain = count;
+            gameData.mine.mark = 0;
+            gameData.over = 0;
+            gameData.time = 0;
+            updateView();
+            startTime();
+
+            var html = '';
+            var mineArr = minePosition(width * height, count);
+            var x = 0;
+            var y = 0;
+            var index = 0;
+            var hasMine = 0;
+            for (y = 0; y < height; y++) {
+                html += '<ul class="mine_row" y="' + y + '">'
+                for (x = 0; x < width; x++) {
+                    index = y * width + x;
+                    hasMine = +mineArr.includes(index);
+                    //mark 1被标记；open 1被翻开；count 周围9格内炸弹数量； mine 1是炸弹； index 所有格子中顺序
+                    html += '<li class="mine_item" mark="0" open="0" count="0" mine="' + hasMine + '" index="' + index + '" x="' + x + '" y="' + y + '"></li>'
+                }
+                html += '</ul>'
+            }
+            $('.mine_area').html(html);
+            calcMineCount();
+
+
+        }
+
+        //计算单元格数字
+        function calcMineCount() {
+            $('.mine_item[mine="1"]').each(function() {
+                var $this = $(this);
+                var x = +$this.attr('x');
+                var y = +$this.attr('y');
+
+                eachArountCell(9, x, y, function($item, curX, curY) {
+                    $item.attr('count', +$item.attr('count') + 1);
+                    // $item.text($item.attr('count'));
+                })
+
+            })
+        }
+
+        //打开周围空白单元格
+        function openNullCell($this) {
+            var x = +$this.attr('x');
+            var y = +$this.attr('y');
+            console.log('openNullCell', x, y)
+            eachArountCell(8, x, y, function($item, curX, curY) {
+
+                var open = $item.attr('open');
+                $item.attr('open', '1');
+                console.log('openNullCell 2', curX, curY, open)
+
+                if (open !== '1' && $item.attr('count') === '0') {
+                    openNullCell($item);
+                }
+            })
+        }
+
+
+
+        //遍历某个单元格和它周围的单元格。@type:1周围8个，2周围4个。
+        function eachArountCell(type, x, y, callback) {
+            if (typeof callback !== 'function') {
+                return;
+            }
+            var arrDict = {
+                8: [
+                    [-1, -1],
+                    [0, -1],
+                    [1, -1],
+                    [-1, 0],
+                    // [0, 0],
+                    [1, 0],
+                    [-1, 1],
+                    [0, 1],
+                    [1, 1]
+                ],
+                4: [
+                    [0, -1],
+                    [-1, 0],
+                    // [0, 0],
+                    [1, 0],
+                    [0, 1],
+                ],
+            }
+            arrDict['9'] = arrDict['8'].concat([0, 0]);
+            arrDict['5'] = arrDict['4'].concat([0, 0]);
+            var arr = arrDict[type];
+            var txt = '';
+            var curX = 0;
+            var curY = 0;
+            for (var i = 0; i < arr.length; i++) {
+                var v = arr[i];
+                curX = x + v[0];
+                curY = y + v[1];
+                txt = '.mine_item[x="' + curX + '"][y="' + curY + '"]';
+                var $item = $(txt);
+                if ($item.length > 0) {
+                    callback($item, curX, curY);
+                }
+
+            }
+        }
+
+        //生成地雷位置数组
+        function minePosition(total, count) {
+            var arr = [];
+            var num;
+            if (count > total) {
+                count = total;
+            }
+            while (arr.length < count) {
+                num = randomNum(0, total - 1);
+                if (!arr.includes(num)) {
+                    arr.push(num);
+                }
+            }
+            arr = arr.sort((x, y) => x - y); //升序
+            console.log('minePosition', arr);
+            return arr;
+        }
+
+        //生成从minNum到maxNum的随机数
+        function randomNum(minNum, maxNum) {
+            switch (arguments.length) {
+                case 1:
+                    return parseInt(Math.random() * minNum + 1, 10); //[1,n]
+                    break;
+                case 2:
+                    return parseInt(Math.random() * (maxNum - minNum + 1) + minNum, 10);
+                    break;
+                default:
+                    return 0;
+                    break;
+            }
+        }
+
+        function showErr(txt, time) {
+            showMsg(txt, 2, time);
+        }
+        // 提示消息
+        function showMsg(txt, type, time) {
+            type = type || 1;
+            time = time || 1500;
+            if (time < 500) {
+                time = 500;
+            }
+            var $msg = $('<div class="message" type="' + type + '">' + txt + '</div>');
+            $('.message_wrap').append($msg);
+            setTimeout(function() {
+                $msg.remove();
+            }, time)
+        }
+    </script>
+
+</body>
+
+</html>
